@@ -58,6 +58,34 @@ void displayMnemonics()
 		}
 
 }
+void dispFile(char st[], char name[])
+  {
+		FILE *fp;
+		char ch;
+
+		fp=fopen(st,"r");
+
+		if(fp==NULL)
+		{
+				printf("\nERROR: in reading %s file", name);
+		}
+		else
+		{
+				printf("\n_____________________________________________\n");
+				printf("The contents of %s file :", name);
+				printf("\n_____________________________________________\n");
+
+				ch=fgetc(fp);
+				while(ch!=EOF)
+				{
+					printf("%c",ch);
+					ch=fgetc(fp);
+				}
+				fclose(fp);
+				printf("\n_____________________________________________\n\n");
+		}
+  }
+
 int searchOptabForSymbol(char file[], char smnemonic[], stopcode* op)
 {
 		FILE *fp;
