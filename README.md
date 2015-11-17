@@ -1,3 +1,33 @@
+void displayMnemonics()
+{
+		FILE *fp;
+		char m[20];
+		int c,l;
+
+		fp=fopen("OPTAB.DAT","r");
+
+		if(fp==NULL)
+		{
+				printf("\nERROR: in reading Mnemonics");
+		}
+		else
+		{
+				printf("\n_____________________________________________\n");
+				printf("\nMnemonics Supported");
+				printf("\n_____________________________________________\n");
+				printf("\n%15s%9s%9s","Name","Code","Length");
+				printf("\n_____________________________________________\n");
+
+
+				while((fscanf(fp,"%s%d%d",m,&c,&l))!=EOF)
+				{
+					printf("\n%15s%9d%9d",m,c,l);
+				}
+				fclose(fp);
+				printf("\n_____________________________________________\n\n");
+		}
+
+}
 int searchOptabForSymbol(char file[], char smnemonic[], stopcode* op)
 {
 		FILE *fp;
