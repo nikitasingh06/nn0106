@@ -1,3 +1,33 @@
+void addMnemonics()
+{
+		FILE *fp;
+		int c,l;
+		char m[20];
+
+		fp=fopen("OPTAB.DAT","a");
+
+		if(fp==NULL)
+		{
+				printf("\nERROR: in adding Mnemonics");
+		}
+		else
+		{
+				printf("\nEnter Mnemonic Name: ");
+				scanf("%s",m);
+				printf("\nEnter Mnemonic Code: ");
+				scanf("%d",&c);
+				//printf("\nEnter Mnemonic Length: ");
+				//scanf("%d",&l);
+				l=3;
+
+				fprintf(fp,"\n%s\t%d\t%d",m,c,l);
+				fclose(fp);
+		}
+
+}
+
+
+
 void displayMnemonics()
 {
 		FILE *fp;
