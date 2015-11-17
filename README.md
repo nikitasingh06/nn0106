@@ -1,4 +1,4 @@
-int searchOptabForSymbol(char file[], char smnemonic[], stopcode* op)// searching optable for symbol
+int searchOptabForSymbol(char file[], char smnemonic[], stopcode* op)
 {
 		FILE *fp;
 
@@ -19,7 +19,7 @@ int searchOptabForSymbol(char file[], char smnemonic[], stopcode* op)// searchin
 		return 0;
 
 }
-  int dupSymbol(char file[], char lbl[])// function for identifying duplicate symbol
+  int dupSymbol(char file[], char lbl[])
   {
 		FILE *fp;
 		char label[20];
