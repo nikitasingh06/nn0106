@@ -129,5 +129,27 @@ int searchOptabForSymbol(char file[], char smnemonic[], stopcode* op)
 		}
 		return 0;
   }
+int getSymbolValue(char file[], char lbl[])
+  {
+		FILE *fp;
+		char label[20];
+		int loc;
+
+		fp=fopen(file,"r");
+
+		if(fp==NULL)
+		{
+				printf("\nERROR: in opening Symbol Table");
+		}
+		else
+		{
+				while(fscanf(fp,"%s\t%d",label,&loc)!=EOF)
+				{
+				 if(strcmp(label,lbl)==0)return loc;
+				}
+				fclose(fp);
+		}
+		return 0;
+  }
 
   
