@@ -1,3 +1,11 @@
+void  showSplash()
+{
+	int s=2000;
+	printf("WELCOME TO HYPOTHETICAL MACHINE ASSEMBLER");
+	printf("\n\n\tCREATED BY: NIDHI AND NIKITA");
+	sleep(s);
+}
+
 char getChoice()
 {
 	char choice;
