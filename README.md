@@ -182,5 +182,11 @@ int getSymbolValue(char file[], char lbl[])
 		}
 		return 0;
   }
+  void sleep(unsigned int m)
+
+{
+ clock_t goal = m+clock();
+ while(goal>clock());
+}
 
   
