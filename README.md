@@ -29,6 +29,77 @@ char getChoice()
 
 	return choice;
 }
+int pass1(char inputFile[])
+{
+ char opcode[10],operand[10],label[10];
+ stopcode op;
+ int locctr,start,len;
+
+ char sTable[20], opTable[20], interFile[20];
+ FILE *fp1,*fp2,*fp3;
+
+
+ strcpy(interFile, "I_");
+ strcpy(sTable, "S_");
+
+ strcat(interFile, inputFile);
+ strcat(sTable, inputFile);
+ strcpy(opTable, "OPTAB.dat");
+
+
+ fp1=fopen(inputFile,"r");
+ fp2 = fopen(sTable,"w");
+ fp3=fopen(interFile,"w");
+
+ fclose(fp2);
+ fscanf(fp1,"%s%s%s",label,opcode,operand);
+ if(strcmp(opcode,"START")==0)
+  {
+	start=atoi(operand);
+	locctr=start;
+	fprintf(fp3,"%s\t%s\t%s\n",label,opcode,operand);
+	fscanf(fp1,"%s%s%s",label,opcode,operand);
+  }
+ else
+  locctr=0;
+
+
+ while(strcmp(opcode,"END")!=0)
+  {
+	fprintf(fp3,"%d",locctr);
+	if(strcmp(label,"**")!=0)
+	{
+	  if(!dupSymbol(sTable,label))
+			addSymbol(sTable,label,locctr);
+	  else
+	  {
+		printf("\n\nERROR : Duplicate Symbol Encountered\n\n");
+		return(0);
+	  }
+	}
+
+	if( searchOptabForSymbol(opTable,opcode,&op))
+	{
+	  locctr= locctr + op.length;
+	}
+	if(strcmp(opcode,"WORD")==0)
+	 locctr+=3;
+	else if(strcmp(opcode,"RESW")==0)
+	 locctr+=(3*(atoi(operand)));
+	else if(strcmp(opcode,"RESB")==0)
+	 locctr+=(atoi(operand));
+	else if(strcmp(opcode,"BYTE")==0)
+	 ++locctr;
+	fprintf(fp3,"\t%s\t%s\t%s\n",label,opcode,operand);
+	fscanf(fp1,"%s%s%s",label,opcode,operand);
+  }
+  fprintf(fp3,"%d\t%s\t%s\t%s\n",locctr,label,opcode,operand);
+  fclose(fp3);
+  //len=locctr-start;
+  //printf("\nThe length of the program is %d.\n\n",len);
+  return 1;
+}
+
 void addMnemonics()
 {
 		FILE *fp;
