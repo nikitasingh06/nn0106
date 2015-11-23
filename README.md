@@ -99,7 +99,143 @@ int pass1(char inputFile[])
   //printf("\nThe length of the program is %d.\n\n",len);
   return 1;
 }
+int pass2(char inputFile[])
+{
+	char a[10],ad[10],label[10],opcode[10],operand[10];
+	int st,diff,i,address,add,len,actual_len,finaddr,prevaddr,j=0;
 
+ stopcode op;
+
+
+ char sTable[20], opTable[20], interFile[20], objectFile[20],assblyFile[20];
+ FILE *fp0,*fp1,*fp2,*fp3,*fp4;
+
+
+ strcpy(interFile, "I_");
+ strcpy(sTable, "S_");
+
+ strcpy(assblyFile, "A_");
+ strcpy(objectFile, "O_");
+
+ strcat(interFile, inputFile);
+ strcat(sTable, inputFile);
+ strcat(assblyFile, inputFile);
+ strcat(objectFile, inputFile);
+
+
+ strcpy(opTable, "OPTAB.dat");
+
+ fp0=fopen(inputFile,"r");
+ fp1=fopen(assblyFile,"w");
+ fp2 = fopen(sTable,"r");
+ fp3=fopen(interFile,"r");
+ fp4=fopen(objectFile,"w");
+
+ if(fp0==NULL)
+ {
+  printf("\n\nERROR : Source File does not exist");
+  return 0;
+ }
+
+ if(fp2==NULL)
+ {
+  printf("\n\nERROR : Symbol Table does not exist");
+  return 0;
+ }
+ if(fp3==NULL)
+ {
+  printf("\n\nERROR : Intermediate File does not exist");
+  return 0;
+ }
+
+  fclose(fp0);
+  fclose(fp2);
+  fscanf(fp3,"%s%s%s",label,opcode,operand);
+
+  address=0;
+  while(strcmp(opcode,"END")!=0)
+  {
+	prevaddr=address;
+	fscanf(fp3,"%d%s%s%s",&address,label,opcode,operand);
+  }
+  finaddr=address;
+  fclose(fp3);
+
+  fp3=fopen(interFile,"r");
+
+  fscanf(fp3,"%s%s%s",label,opcode,operand);
+  if(strcmp(opcode,"START")==0)
+  {
+	fprintf(fp1,"\t%s\t%s\t%s\n",label,opcode,operand);
+	fprintf(fp4,"H^%s^00%s",label,operand);
+	fscanf(fp3,"%d%s%s%s",&address,label,opcode,operand);
+	st=address;
+	diff=prevaddr-st;
+
+	fprintf(fp4,"^00%d\n",finaddr-st);
+	fprintf(fp4,"T^00%d^%d",address,diff);
+  }
+
+  while(strcmp(opcode,"END")!=0)
+  {
+	if(strcmp(opcode,"BYTE")==0)
+	{
+	 fprintf(fp1,"%d\t%s\t%s\t%s\t\t",address,label,opcode,operand);
+	 len=strlen(operand);
+	 actual_len=len-3;
+	 fprintf(fp4,"^");
+	 for(i=2;i<(actual_len+2);i++)
+	 {
+	  itoa(operand[i],ad,16);
+	  fprintf(fp1,"%s",ad);
+	  fprintf(fp4,"%s",ad);
+	 }
+	 fprintf(fp1,"\n");
+	}
+	else if(strcmp(opcode,"WORD")==0)
+	{
+	 len=strlen(operand);
+	 itoa(atoi(operand),a,10);
+	 fprintf(fp1,"%d\t%s\t%s\t%s\t\t00000%s\n",address,label,opcode,operand,a);
+	 fprintf(fp4,"^00000%s",a);
+	}
+	else if((strcmp(opcode,"RESB")==0)||(strcmp(opcode,"RESW")==0))
+	 fprintf(fp1,"%d\t%s\t%s\t\t%s\n",address,label,opcode,operand);
+	else
+	{
+		if( searchOptabForSymbol(opTable,opcode,&op))
+		{
+		  add = getSymbolValue(sTable,operand);
+		  if(add == 0)
+		  {
+			  printf("\nSymbol not found : %s\n",operand);
+			  getch();
+		  }
+		  else
+		  {
+			 if(strcmp(operand,"COPY")==0)
+				fprintf(fp1,"%d\t%s\t%s\t%s\t\t%d0000\n",address,label,opcode,operand,op.code);
+			 else
+			 {
+				  fprintf(fp1,"%d\t%s\t%s\t%s\t\t%d%d\n",address,label,opcode,operand,op.code,add);
+				  fprintf(fp4,"^%d%d",op.code,add);
+			 }
+		  }
+		}
+	}
+	fscanf(fp3,"%d%s%s%s",&address,label,opcode,operand);
+  }
+
+  fprintf(fp1,"%d\t%s\t%s\t%s\n",address,label,opcode,operand);
+  fprintf(fp4,"\nE^00%d",st);
+
+ // printf("\n Intermediate file is converted into object code");
+  fclose(fp1);
+  fclose(fp2);
+  fclose(fp3);
+  fclose(fp4);
+  return 1;
+}
 void addMnemonics()
 {
 		FILE *fp;
