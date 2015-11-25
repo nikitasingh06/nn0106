@@ -1,11 +1,14 @@
 void  showSplash()
 {
 	int s=2000;
-	printf("WELCOME TO HYPOTHETICAL MACHINE ASSEMBLER");
-	printf("\n\n\tCREATED BY: NIDHI AND NIKITA");
+	printf("\n\n\n\n\n\n");
+	printf("\t\t\tWELCOME TO HYPOTHETICAL MACHINE ASSEMBLER");
+	printf("\n\n\n\n\n\n");
+	printf("\t\t\tDeveloped BY:");
+	printf("\n\t\t\t\t\t NIDHI");
+	printf("\n\t\t\t\t\t NIKITA");
 	sleep(s);
 }
-
 char getChoice()
 {
 	char choice;
@@ -254,6 +257,12 @@ void addMnemonics()
 				scanf("%s",m);
 				printf("\nEnter Mnemonic Code: ");
 				scanf("%d",&c);
+
+				if(getNumberOfDigits(c)>2)
+                {
+                    printf("\nERROR : Max Length of code is two digits");
+                    return;
+                }
 				//printf("\nEnter Mnemonic Length: ");
 				//scanf("%d",&l);
 				l=3;
@@ -262,6 +271,12 @@ void addMnemonics()
 				fclose(fp);
 		}
 
+}
+
+// work only for positive numbers
+int getNumberOfDigits (int i)
+{
+    return i > 0 ? (int) log10 ((double) i) + 1 : 1;
 }
 
 
@@ -388,6 +403,22 @@ int getSymbolValue(char file[], char lbl[])
 				fclose(fp);
 		}
 		return 0;
+  }
+  void addSymbol(char st[], char label[], int loc)
+	{
+		FILE *fp;
+
+		fp=fopen(st,"a");
+
+		if(fp==NULL)
+		{
+				printf("\nERROR: in adding Symbol in Symbol Table");
+		}
+		else
+		{
+				fprintf(fp,"%s\t%04x\n",label,loc);
+				fclose(fp);
+		}
   }
   void sleep(unsigned int m)
 
