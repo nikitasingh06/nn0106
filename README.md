@@ -552,5 +552,90 @@ void trecT0Str(char *trecord,char* str, int skip)
 	}
 	str[m]='\0';
 }
+void loaderHeader()
+{
+    printf("\n--------------------------------------------------------------------------");
+    printf("\n\t\t\t\tLoader Output");
+	printf("\n--------------------------------------------------------------------------");
+	printf("\nMemory Address\t\t             Contents");
+	printf("\n--------------------------------------------------------------------------");
+}
+void loader(char s[], int locc)
+{
+	int i;
+	// fill object code
+	for(i=0;s[i]!='\0';i++)
+	{
+			if(i%32==0)
+			{
+				printf("\n%04x\t",locc);
+				locc += 16;
+			}
+			if(i%8==0 )
+			{
+				printf("\t");
+			}
+
+		printf("%c",s[i]);
+
+	}
+	// fill remaining entries in line
+
+	if(i%32!=0)
+	{
+		while(i%32!=0)
+		{
+			if(i%8==0 )
+			{
+				printf("\t");
+			}
+
+			printf("x");
+			i++;
+		}
+	}
+}
+
+void loaderUpper(int locc)
+{
+
+	int i,j;
+	// fill upper portion
+	for(j=0;(j<locc && j<35 );j=j+16)
+	{
+		for(i=0;i<32;i++)
+		{
+			if(i%32==0)
+			{
+				printf("\n%04x\t",j);
+			}
+			if(i%8==0)
+			{
+				printf("\t");
+			}
+			printf("x");
+		}
+	}
+	if(j<locc)
+	{
+		for(i=0;i<3;i++)
+		{
+			printf("\n----\t\t--------\t--------\t--------\t--------");
+		}
+	}
+
+}
+
+void loaderLower()
+{
+
+	int j;
+	//fill last portion
+	for(j=0;j<3;j++)
+	{
+			printf("\n----\t\t--------\t--------\t--------\t--------");
+	}
+
+}
 
   
