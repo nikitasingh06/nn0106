@@ -426,5 +426,131 @@ int getSymbolValue(char file[], char lbl[])
  clock_t goal = m+clock();
  while(goal>clock());
 }
+void getHexValue(int n, char* hex, int l)
+{
+ int i,len;
+ char *t = (char*)malloc(sizeof(char)*l);
+
+ itoa(n,t,16);
+ len = strlen(t);
+
+ for(i=0;i<l-len-1;i++)
+	hex[i]='0';
+ hex[i]='\0';
+ strcat(hex,t);
+}
+void fillZeros(int n, char* hex, int l)
+{
+ int i,len;
+ char *t = (char*)malloc(sizeof(char)*l);
+
+ itoa(n,t,10);
+ len = strlen(t);
+
+ for(i=0;i<l-len-1;i++)
+	hex[i]='0';
+ hex[i]='\0';
+ strcat(hex,t);
+}
+int getStartAdd(char f[])
+{
+		FILE *fp;
+        char temp[60],st[7],*p;
+        int i,j;
+		fp=fopen(f,"r");
+
+		if(fp==NULL)
+		{
+				printf("\nERROR: in reading Start Location from Object File for Loader");
+				return -1;
+		}
+		else
+		{
+
+                while(fgets(temp,59,fp))
+                {
+                    if(temp[0]=='H')
+                    {
+                        p=strstr(temp,"^");
+                        p=strstr(p+1,"^");
+                        p++;
+                        i=0;
+                        j=0;
+                        while(p[i]!='^')st[j++]=p[i++];
+                        p[i]='\0';
+                        break;
+                    }
+                }
+				fclose(fp);
+				return strToHex(st);
+		}
+}
+int strToHex(char s[])
+{
+    char *p;
+    int uv=0;
+    uv=strtoul(s, &p, 16);
+    return uv;
+}
+
+void getTRecord(char f[],char trecord[])
+{
+		FILE *fp;
+        char temp[72];
+        int loc;
+		fp=fopen(f,"r");
+
+		if(fp==NULL)
+		{
+				printf("\nERROR: in reading Object File for Loader");
+		}
+		else
+		{
+                strcpy(trecord,"");
+                while(fgets(temp,72,fp))
+                {
+                    if(temp[0]=='T')
+                    {
+                        strcat(trecord,temp);
+                        loc = strcspn(trecord,"\n");
+                        if(loc!=-1)
+                            trecord[loc]='\0';
+                    }
+                }
+				fclose(fp);
+        }
+}
+void trecT0Str(char *trecord,char* str, int skip)
+{
+	char*p;
+	int i=0,trecLen,m=0,count,		 tFound=0;
+
+	while(trecord[i]!='\0')
+	{
+		if(trecord[i]=='T')
+		{
+		 tFound=1;
+		 count=skip;
+		 i++;
+		 continue;
+		}
+
+		if(tFound && count!=0)
+		{
+			if(trecord[i]=='^')count--;
+			if(count==0)
+			{
+			 tFound=0;
+			}
+			i++;
+			continue;
+		}
+		if(trecord[i]!='^')
+			str[m++]=trecord[i];
+		i++;
+
+	}
+	str[m]='\0';
+}
 
   
