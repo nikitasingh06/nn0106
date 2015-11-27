@@ -1,3 +1,120 @@
+void main()
+{
+ char choice;
+ char inputFile[20], file[20], trecord[1000],max30[1000];
+
+
+system("COLOR 57");
+showSplash();
+
+ do
+ {
+	choice = getChoice();
+
+	switch(choice)
+	{
+		case '1':
+					displayMnemonics();
+					break;
+		case '2':
+					addMnemonics();
+
+					break;
+		case '3':
+					printf("\nEnter Source File for Pass 1 : ");
+					scanf("%s",inputFile );
+					if(pass1(inputFile))
+						printf("\n***** Pass 1 Completed Successfully *****\n");
+					else
+						printf("\n***** Error encountered in Pass 1 *****\n");
+					break;
+		case '4':
+					printf("\nEnter Source File for Pass 1 Intermediate Code : ");
+					scanf("%s",inputFile );
+					if(pass1(inputFile))
+					{
+						strcpy(file, "I_");
+						strcat(file, inputFile);
+						dispFile(file, "Intermediate Code");
+					}
+					else
+						printf("\n***** Error encountered in Pass 1 *****\n");
+
+					break;
+
+		case '5':
+					printf("\nEnter Source File for Pass 1 Symbol Table : ");
+					scanf("%s",inputFile );
+					if(pass1(inputFile))
+					{
+						strcpy(file, "S_");
+						strcat(file, inputFile);
+						dispFile(file, "Symbol Table");
+					}
+					else
+						printf("\n***** Error encountered in Pass 1 *****\n");
+					break;
+		case '6':
+					printf("\nEnter Source File for Pass 2 : ");
+					scanf("%s",inputFile );
+					if(pass2(inputFile))
+						printf("\n***** Pass 2 Completed Successfully *****\n");
+					else
+						printf("\n***** Error encountered in Pass 2 *****\n");
+					break;
+		case '7':
+					printf("\nEnter Source File for Pass 2 Object Code : ");
+					scanf("%s",inputFile );
+					if(pass2(inputFile))
+					{
+						strcpy(file, "A_");
+						strcat(file, inputFile);
+						dispFile(file, "Source Code with Object Code");
+
+						strcpy(file, "O_");
+						strcat(file, inputFile);
+						dispFile(file, "Object Program for Loader");
+                        // loader code
+                        getTRecord(file,trecord);
+                        trecT0Str(trecord,max30, 3);
+
+                       // puts(max30);
+                        //printf("\nLength : %d", strlen(max30));
+
+                        printf("\n\nPress y to Relocate : ");
+                        char ch=getche();
+                        int locc;
+                        if(ch=='y' || ch=='Y')
+                        {
+                            printf("\nEnter Relocatable Address : ");
+                            scanf("%d",&locc);
+                        }
+                        else
+                        {
+                            locc = getStartAdd(file);
+                        }
+
+                        //printf("\nAddress Start - %d : %x",locc,locc);
+                        loaderHeader();
+
+                        loaderUpper(locc);
+                        loader(max30,locc);
+                        loaderLower();
+					}
+					else
+						printf("\n***** Error encountered in Pass 2 *****\n");
+					break;
+		case '8':	break;
+		default:
+					printf("\n\nERROR: Invalid Option Selected");
+					break;
+	}
+	printf("\n\nPress any key to continue.............");
+	getch();
+
+ }while(choice!='8');
+
+}
 void  showSplash()
 {
 	int s=2000;
