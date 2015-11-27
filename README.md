@@ -104,13 +104,13 @@ int pass1(char inputFile[])
 }
 int pass2(char inputFile[])
 {
-	char a[10],ad[10],label[10],opcode[10],operand[10];
-	int st,diff,i,address,add,len,actual_len,finaddr,prevaddr,j=0;
+	char a[10],ad[10],label[10],opcode[10],operand[10],trec[100],trectemp[100];
+	int st,diff,i,address,add,trecstartadd,len,actual_len,finaddr,prevaddr,j=0,count=0;
 
  stopcode op;
 
 
- char sTable[20], opTable[20], interFile[20], objectFile[20],assblyFile[20];
+ char sTable[20], opTable[20], interFile[20], objectFile[20],assblyFile[20],modr[100],modrt[30];
  FILE *fp0,*fp1,*fp2,*fp3,*fp4;
 
 
@@ -156,6 +156,9 @@ int pass2(char inputFile[])
   fscanf(fp3,"%s%s%s",label,opcode,operand);
 
   address=0;
+
+  fscanf(fp3,"%x%s%s%s",&address,label,opcode,operand);
+
   while(strcmp(opcode,"END")!=0)
   {
 	prevaddr=address;
@@ -171,39 +174,55 @@ int pass2(char inputFile[])
   {
 	fprintf(fp1,"\t%s\t%s\t%s\n",label,opcode,operand);
 	fprintf(fp4,"H^%s^00%s",label,operand);
+
 	fscanf(fp3,"%d%s%s%s",&address,label,opcode,operand);
 	st=address;
+	trecstartadd=address;
 	diff=prevaddr-st;
 
-	fprintf(fp4,"^00%d\n",finaddr-st);
-	fprintf(fp4,"T^00%d^%d",address,diff);
+	fprintf(fp4,"^%06d\n",finaddr-st);
+
   }
+
+    strcpy(modr,"");
+    strcpy(trec,"");
 
   while(strcmp(opcode,"END")!=0)
   {
 	if(strcmp(opcode,"BYTE")==0)
 	{
-	 fprintf(fp1,"%d\t%s\t%s\t%s\t\t",address,label,opcode,operand);
+	 fprintf(fp1,"%04d\t%s\t%s\t%s\t\t",address,label,opcode,operand);
 	 len=strlen(operand);
 	 actual_len=len-3;
-	 fprintf(fp4,"^");
+
+	 sprintf(trectemp,"^");
+	 strcat(trec,trectemp);
+
 	 for(i=2;i<(actual_len+2);i++)
 	 {
 	  itoa(operand[i],ad,16);
 	  fprintf(fp1,"%s",ad);
-	  fprintf(fp4,"%s",ad);
+
+
+	  sprintf(trectemp,"%s",ad);
+	  count+=strlen(ad);
+
 	 }
+
 	 fprintf(fp1,"\n");
 	}
 	else if(strcmp(opcode,"WORD")==0)
 	{
-	 len=strlen(operand);
-	 itoa(atoi(operand),a,10);
-	 fprintf(fp1,"%d\t%s\t%s\t%s\t\t00000%s\n",address,label,opcode,operand,a);
-	 fprintf(fp4,"^00000%s",a);
+
+        fprintf(fp1,"%04d\t%s\t%s\t%s\t\t%06x\n",address,label,opcode,operand,atoi(operand));
+
+        sprintf(trectemp,"^%06x",atoi(operand));
+        strcat(trec,trectemp);
+
+        count+=6;
 	}
 	else if((strcmp(opcode,"RESB")==0)||(strcmp(opcode,"RESW")==0))
-	 fprintf(fp1,"%d\t%s\t%s\t\t%s\n",address,label,opcode,operand);
+	 fprintf(fp1,"%04d\t%s\t%s\t\t%s\n",address,label,opcode,operand);
 	else
 	{
 		if( searchOptabForSymbol(opTable,opcode,&op))
@@ -216,12 +235,29 @@ int pass2(char inputFile[])
 		  }
 		  else
 		  {
+
 			 if(strcmp(operand,"COPY")==0)
-				fprintf(fp1,"%d\t%s\t%s\t%s\t\t%d0000\n",address,label,opcode,operand,op.code);
+				fprintf(fp1,"%04d\t%s\t%s\t%s\t\t%d0000\n",address,label,opcode,operand,op.code);
 			 else
 			 {
-				  fprintf(fp1,"%d\t%s\t%s\t%s\t\t%d%d\n",address,label,opcode,operand,op.code,add);
-				  fprintf(fp4,"^%d%d",op.code,add);
+			      sprintf(modrt,"\nM^%06d^04",address);
+			      strcat(modr,modrt);
+			      fprintf(fp1,"%04d\t%s\t%s\t%s\t\t%02d%04d\n",address,label,opcode,operand,op.code,add);
+                  sprintf(trectemp,"^%02d%04d",op.code,add);
+                  strcat(trec, trectemp);
+                  count+=6;
+
+
+				  if(count==60)
+                  {
+
+                    fprintf(fp4,"\nT^%06d^%x%s",trecstartadd,count/2,trec);
+                    trecstartadd = trecstartadd + count/2;
+                    strcpy(trec,"");
+                    strcpy(trectemp,"");
+                    count=0;
+                  }
+
 			 }
 		  }
 		}
@@ -229,14 +265,21 @@ int pass2(char inputFile[])
 	fscanf(fp3,"%d%s%s%s",&address,label,opcode,operand);
   }
 
-  fprintf(fp1,"%d\t%s\t%s\t%s\n",address,label,opcode,operand);
-  fprintf(fp4,"\nE^00%d",st);
+ if(count!=0)
+ {
 
- // printf("\n Intermediate file is converted into object code");
+   fprintf(fp4,"\nT^%06d^%x%s",trecstartadd,count/2,trec);
+ }
+
+    fprintf(fp1,"%04d\t%s\t%s\t%s\n",address,label,opcode,operand);
+    fprintf(fp4,"%s",modr);
+    fprintf(fp4,"\nE^%06d",st);
+
   fclose(fp1);
   fclose(fp2);
   fclose(fp3);
   fclose(fp4);
+
   return 1;
 }
 void addMnemonics()
