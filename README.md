@@ -1,3 +1,40 @@
+#include<stdio.h>
+#include<conio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<time.h>
+
+typedef struct
+{
+	char mnemonic[20];
+	int code;
+	int length;
+}stopcode;
+
+int getStartAdd();
+int strToHex(char[]);
+void getTRecord(char*,char*);
+void trecT0Str(char *,char* , int);
+void loader(char s[],int);
+void loaderHeader();
+void	loaderUpper(int);
+void	loaderLower();
+
+void getHexValue(int, char*, int);
+void fillZeros(int, char*, int);
+char getChoice();
+void  showSplash();
+void dispFile(char[], char[]);
+void addSymbol(char[], char[], int);
+int dupSymbol(char[], char[]);
+int searchOptabForSymbol(char[], char[], stopcode*);
+void sleep(unsigned int);
+int pass1(char[]);
+int pass2(char[]);
+void displayMnemonics();
+void addMnemonics();
+int getSymbolValue(char file[], char lbl[]);
+
 void main()
 {
  char choice;
